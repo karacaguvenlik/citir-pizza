@@ -14,10 +14,11 @@ const local = value => typeof value === 'object' && value ? value[lang] || value
 const money = value => new Intl.NumberFormat({tr:'tr-TR',en:'en-GB',de:'de-DE',ru:'ru-RU'}[lang],{style:'currency',currency:'TRY',maximumFractionDigits:2}).format(Number(value) || 0);
 const safeRead = (key, fallback) => {try {return JSON.parse(localStorage.getItem(key)) ?? fallback;} catch {return fallback;}};
 const safeWrite = (key,value) => {try {localStorage.setItem(key,JSON.stringify(value));} catch {}};
-let catalog = null, category = 'all', query = '', cart = safeRead('citir-cart',[]), regionId = safeRead('citir-region',''), toastTimer;
+let catalog = null, category = 'all', query = '', cart = safeRead('citir-presentation-cart',[]), regionId = safeRead('citir-presentation-region',''), toastTimer;
 if (!Array.isArray(cart)) cart = [];
 cart = cart.filter(i => typeof i.productId === 'string' && Number.isInteger(i.quantity) && i.quantity > 0 && i.quantity <= 20).slice(0,50);
 const safeImage = value => {
+ if(/^\.\/images\/[a-zA-Z0-9_./-]+$/.test(value || ''))return value;
  if(/^\/images\/[a-zA-Z0-9_./-]+$/.test(value || ''))return '.'+value;
  try{const url=new URL(value);if(url.protocol==='https:' && !url.username && !url.password)return url.href;}catch{}
  return './images/hero-pizza.webp';
@@ -29,14 +30,18 @@ const regions = () => catalog?.regions.filter(r => r.active) || [];
 const selectedRegion = () => regions().find(r => r.id === regionId);
 const notify = message => {clearTimeout(toastTimer);$('#toast').textContent=message;$('#toast').hidden=false;toastTimer=setTimeout(()=>$('#toast').hidden=true,2400);};
 async function request(url) {
- if(url !== '/api/catalog') throw new Error('This presentation does not accept orders.');
- const response=await fetch('./menu.json');
- if(!response.ok) throw new Error(t('network'));
- return response.json();
+ if(url !== '/api/catalog') throw new Error('Presentation mode only');
+ return window.CitirDemo.request('/catalog');
 }
+const demoCopy={
+ tr:{panel:'Demo yönetim paneli ↗',checkout:'Demo sipariş oluştur',title:'Sipariş akışını dene',explanation:'Gerçek sipariş oluşturulmaz veya ödeme alınmaz. Ad, telefon ve adres istenmez. Yalnızca bu tarayıcıdaki temsili panele örnek sipariş eklenir.',send:'Temsili siparişi panele ekle',success:'Demo sipariş eklendi. Yönetim panelinden görüntüleyebilirsin.',privacy:'Bu site yalnızca gösterim içindir. Gerçek sipariş, ödeme, müşteri bilgisi toplama veya güvenli kullanıcı yetkilendirmesi yoktur. Sepet ve panel değişiklikleri bu tarayıcıda saklanır; diğer cihazlara aktarılmaz. Panelde demo verileri sıfırlanabilir.'},
+ en:{panel:'Demo management panel ↗',checkout:'Create demo order',title:'Try the ordering flow',explanation:'No real order or payment. No name, phone or address is requested. A sample order is added only to this browser’s demonstration panel.',send:'Add sample order to panel',success:'Demo order added. View it in the management panel.',privacy:'Presentation only. No real orders, payments, customer details or secure user authorization. Basket and panel changes are stored only in this browser, not shared with other devices. Reset demo data in the panel.'},
+ de:{panel:'Demo-Verwaltung ↗',checkout:'Demo-Bestellung erstellen',title:'Bestellablauf testen',explanation:'Keine echte Bestellung oder Zahlung. Name, Telefon und Adresse werden nicht abgefragt. Ein Beispielauftrag wird nur im Demo-Panel dieses Browsers hinzugefügt.',send:'Beispielauftrag zum Panel hinzufügen',success:'Demo-Bestellung hinzugefügt. Im Verwaltungspanel ansehen.',privacy:'Nur Vorführung. Keine echten Bestellungen, Zahlungen, Kundendaten oder sichere Benutzeranmeldung. Warenkorb und Paneländerungen bleiben nur in diesem Browser und werden nicht mit anderen Geräten geteilt. Demodaten können im Panel zurückgesetzt werden.'},
+ ru:{panel:'Демо-панель управления ↗',checkout:'Создать демо-заказ',title:'Попробуйте процесс заказа',explanation:'Реальный заказ и оплата не выполняются. Имя, телефон и адрес не запрашиваются. Пример заказа появится только в демо-панели этого браузера.',send:'Добавить пример заказа в панель',success:'Демо-заказ добавлен. Посмотрите его в панели управления.',privacy:'Только демонстрация. Нет реальных заказов, платежей, сбора клиентских данных или защищённой авторизации. Корзина и изменения панели хранятся только в этом браузере, без передачи другим устройствам. Данные можно сбросить в панели.'}
+};
 const presentationText={tr:'GÖSTERİM DEMOSU · Gerçek sipariş ve ödeme alınmaz. Fiyatlar örnektir.',en:'PRESENTATION DEMO · No real orders or payments. Example prices.',de:'VORFÜHRDEMO · Keine echten Bestellungen oder Zahlungen. Beispielpreise.',ru:'ДЕМОНСТРАЦИЯ · Реальные заказы и платежи не принимаются. Цены примерные.'};
 function applyLanguage() {
- document.documentElement.lang=lang; $('#language').value=lang;$('#presentation-notice').textContent=presentationText[lang];
+ document.documentElement.lang=lang; $('#language').value=lang;$('#presentation-notice').textContent=presentationText[lang];$('#demo-panel-link').textContent=demoCopy[lang].panel;
  document.querySelectorAll('[data-t]').forEach(el=>el.textContent=t(el.dataset.t));
  document.querySelectorAll('[data-placeholder]').forEach(el=>el.placeholder=t(el.dataset.placeholder));
  document.querySelectorAll('.close-dialog').forEach(el=>el.setAttribute('aria-label',t('close')));
@@ -76,7 +81,7 @@ function addProduct(id) {
  if(existing) existing.quantity++; else cart.push({productId:id,quantity:1});
  saveCart(); notify(t('added'));
 }
-function saveCart(){safeWrite('citir-cart',cart);renderCart();}
+function saveCart(){safeWrite('citir-presentation-cart',cart);renderCart();}
 function regionOptions() {return `<option value="">${t('selectRegion')}</option>`+regions().map(r=>`<option value="${esc(r.id)}" ${regionId===r.id?'selected':''}>${esc(r.name)}</option>`).join('');}
 function totalMarkup(region, value) {
  return `<div class="total-row"><span>${t('subtotal')}</span><span>${esc(money(value))}</span></div><div class="total-row"><span>${t('delivery')}</span><span>${region ? Number(region.deliveryFee)>0 ? esc(money(region.deliveryFee)):t('free'):'—'}</span></div><div class="total-row grand"><span>${t('total')}</span><span>${esc(money(value+Number(region?.deliveryFee || 0)))}</span></div>`;
@@ -88,15 +93,28 @@ function renderCart() {
  $('#cart-count').textContent=count;$('#mobile-count').textContent=count;$('#mobile-total').textContent=money(value);$('#mobile-cart').hidden=count===0;
  let html;
  if(!lines.length) html=`<div class="cart-empty"><div class="empty-bag"><svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 7h14l1 14H4L5 7Z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg></div><h4>${t('emptyTitle')}</h4><p>${t('emptyText')}</p></div>`;
- else html=`<div class="cart-items">${lines.map(i=>`<div class="cart-line"><div class="cart-line-title"><strong>${esc(local(i.product.name))}</strong><span>${esc(money(i.product.price*i.quantity))}</span></div><div class="cart-line-bottom"><div class="quantity-control"><button data-change="${esc(i.productId)}" data-delta="-1" aria-label="${esc(local(i.product.name)+' −')}">−</button><span>${i.quantity}</span><button data-change="${esc(i.productId)}" data-delta="1" aria-label="${esc(local(i.product.name)+' +')}">+</button></div><button class="remove-item" data-remove="${esc(i.productId)}">${t('remove')}</button></div></div>`).join('')}</div><div class="cart-totals"><label class="region-label">${t('region')}<select class="cart-region">${regionOptions()}</select></label>${region?`<p class="minimum-note ${value>=region.minSubtotal?'met':''}">${value<region.minSubtotal?`${esc(money(region.minSubtotal-value))} ${t('remaining')}`:t('minMet')}</p>`:`<p class="field-note">${regions().length?t('selectRegion'):t('noRegions')}</p>`}${totalMarkup(region,value)}<button class="button primary full checkout-trigger" ${canCheckout?'':'disabled'}>${t('checkout')} <span>→</span></button></div>`;
+ else html=`<div class="cart-items">${lines.map(i=>`<div class="cart-line"><div class="cart-line-title"><strong>${esc(local(i.product.name))}</strong><span>${esc(money(i.product.price*i.quantity))}</span></div><div class="cart-line-bottom"><div class="quantity-control"><button data-change="${esc(i.productId)}" data-delta="-1" aria-label="${esc(local(i.product.name)+' −')}">−</button><span>${i.quantity}</span><button data-change="${esc(i.productId)}" data-delta="1" aria-label="${esc(local(i.product.name)+' +')}">+</button></div><button class="remove-item" data-remove="${esc(i.productId)}">${t('remove')}</button></div></div>`).join('')}</div><div class="cart-totals"><label class="region-label">${t('region')}<select class="cart-region">${regionOptions()}</select></label>${region?`<p class="minimum-note ${value>=region.minSubtotal?'met':''}">${value<region.minSubtotal?`${esc(money(region.minSubtotal-value))} ${t('remaining')}`:t('minMet')}</p>`:`<p class="field-note">${regions().length?t('selectRegion'):t('noRegions')}</p>`}${totalMarkup(region,value)}<button class="button primary full checkout-trigger" ${canCheckout?'':'disabled'}>${demoCopy[lang].checkout} <span>→</span></button></div>`;
  $('#desktop-cart').innerHTML=html;$('#dialog-cart').innerHTML=html;
 
 }
-function openCheckout(){ notify(presentationText[lang]); }
-function renderPrivacy() {
- const messages={tr:'Bu yalnızca gösterim demosudur. Gerçek sipariş ve ödeme alınmaz; ad, telefon ve adres istenmez. Sepet tercihleri yalnızca kendi tarayıcınızda tutulur. Reklam ölçümü ve yönetici girişi yoktur.',en:'This is a presentation demo only. No real orders or payments are accepted. Name, phone and address are not collected. Basket preferences stay in your browser. There is no advertising tracking or admin login.',de:'Dies ist nur eine Vorführdemo. Es werden keine echten Bestellungen oder Zahlungen angenommen. Name, Telefonnummer und Adresse werden nicht erfasst. Warenkorbeinstellungen bleiben in Ihrem Browser. Kein Werbetracking oder Admin-Login.',ru:'Это только демонстрация. Реальные заказы и платежи не принимаются. Имя, телефон и адрес не собираются. Настройки корзины остаются в вашем браузере. Нет рекламного отслеживания или входа администратора.'};
- $('#privacy-content').textContent=messages[lang];
+function renderSimulation(){
+ const copy=demoCopy[lang];$('#simulation-title').textContent=copy.title;$('#simulation-explanation').textContent=copy.explanation;$('#simulate-order').textContent=copy.send;
+ $('#simulation-summary').innerHTML=totalMarkup(selectedRegion(),subtotal());
+ $('#simulate-order').disabled=!cartLines().length||!selectedRegion()||subtotal()<Number(selectedRegion()?.minSubtotal)||!catalog.settings.open;
 }
+function openCheckout(){if(!selectedRegion()||!cartLines().length)return;$('#cart-dialog').close();$('#simulation-error').textContent='';renderSimulation();$('#simulation-dialog').showModal();}
+function renderPrivacy(){$('#privacy-content').textContent=demoCopy[lang].privacy;}
+$('#simulate-order').addEventListener('click',async()=>{
+ const button=$('#simulate-order');button.disabled=true;
+ try{await window.CitirDemo.addOrder(cartLines().map(({productId,quantity})=>({productId,quantity})),regionId,lang);cart=[];saveCart();$('#simulation-dialog').close();notify(demoCopy[lang].success);}
+ catch(error){$('#simulation-error').textContent=error.message;}
+ finally{button.disabled=false;}
+});
+window.addEventListener('citir-demo-change',async event=>{
+ if(event.detail?.reset){cart=[];regionId='';localStorage.removeItem('citir-presentation-cart');localStorage.removeItem('citir-presentation-region');}
+ catalog=await request('/api/catalog');applyLanguage();if($('#simulation-dialog').open)renderSimulation();
+});
+window.addEventListener('focus',async()=>{if(!catalog)return;catalog=await request('/api/catalog');applyLanguage();if($('#simulation-dialog').open)renderSimulation();});
 $('#language').addEventListener('change',event=>{lang=event.target.value;const url=new URL(location);url.searchParams.set('lang',lang);history.replaceState(null,'',url);applyLanguage();});
 $('#search').addEventListener('input',event=>{query=event.target.value.trim();renderProducts();});
 $('#categories').addEventListener('click',event=>{const button=event.target.closest('[data-category]');if(!button)return;category=button.dataset.category;query='';$('#search').value='';renderCategories();renderProducts();});
@@ -109,7 +127,7 @@ document.addEventListener('click',event=>{
 
 
 });
-document.addEventListener('change',event=>{if(event.target.matches('.cart-region')){regionId=event.target.value;safeWrite('citir-region',regionId);renderCart();}});
+document.addEventListener('change',event=>{if(event.target.matches('.cart-region')){regionId=event.target.value;safeWrite('citir-presentation-region',regionId);renderCart();}});
 $('#open-cart').addEventListener('click',()=>$('#cart-dialog').showModal());
 $('#mobile-cart').addEventListener('click',()=>$('#cart-dialog').showModal());
 $('#privacy-link').addEventListener('click',()=>$('#privacy-dialog').showModal());
