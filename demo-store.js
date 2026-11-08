@@ -158,8 +158,10 @@
     throw error(`Demo isteği desteklenmiyor: ${method} ${route}`, 404);
   }
 
-  async function addOrder(items, regionId, locale = 'tr') {
+  async function addOrder(items, regionId, locale = 'tr', address = '') {
     await ready;
+    if (typeof address !== 'string' || address.trim().length < 10 || address.length > 500) throw error('Adres 10–500 karakter arasında olmalıdır.');
+    const deliveryAddress = address.trim();
     const catalog = state.catalog;
     if (catalog.settings.open === false) throw error('Gösterim mağazası şu anda kapalı.', 409);
     const region = catalog.regions.find(item => String(item.id) === String(regionId) && item.active !== false);
@@ -189,7 +191,7 @@
     const id = `DEMO-${Date.now().toString(36).toUpperCase()}`;
     const order = {
       id, orderNumber: id, trackingId: id, status: 'new', createdAt: now, updatedAt: now,
-      customer: { name: 'Demo Müşteri', phone: 'Örnek numara', address: 'Temsili adres — gerçek teslimat yok', note: 'Gösterim siparişi; hazırlamayın.' },
+      customer: { name: 'Demo Müşteri', phone: 'Örnek numara', address: deliveryAddress, note: 'Gösterim siparişi; hazırlamayın.' },
       regionId: region.id, region: { name: region.name }, items: orderItems, subtotal,
       deliveryFee: Number(region.deliveryFee) || 0, total: subtotal + (Number(region.deliveryFee) || 0),
       paymentMethod: 'cash', locale: String(locale || 'tr'), synthetic: true
