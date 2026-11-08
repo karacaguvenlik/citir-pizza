@@ -38,11 +38,15 @@ test('presentation catalog edits, synthetic orders and persistence are browser-l
   const region = catalog.regions.find(r => r.name === 'Oba');
   await demo.request(`/admin/products/${product.id}`, { method: 'PATCH', body: JSON.stringify({ price: 123.5 }) });
   await demo.request(`/admin/regions/${region.id}`, { method: 'PATCH', body: JSON.stringify({ minSubtotal: 200, deliveryFee: 25 }) });
-  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 1 }], region.id, 'tr'));
-  const order = await demo.addOrder([{ productId: product.id, quantity: 2 }], region.id, 'tr');
+  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 1 }], region.id, 'tr', 'Demo Sokak No:10, Daire:5'));
+  const order = await demo.addOrder([{ productId: product.id, quantity: 2 }], region.id, 'tr', 'Demo Sokak No:10, Daire:5');
   const orders = await demo.request('/admin/orders');
   const stored = orders.find(o => o.id === order.id);
   assert.ok(stored);
+  assert.equal(stored.customer.address, 'Demo Sokak No:10, Daire:5');
+  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 2 }], region.id, 'tr', ''));
+  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 2 }], region.id, 'tr', 'x'.repeat(501)));
+  assert.equal((await (await loadDemo(storage)).demo.request('/admin/orders')).find(o=>o.id===order.id).customer.address, stored.customer.address);
   assert.equal(stored.total, 272);
   assert.match(stored.customer.name, /demo|örnek|temsili/i);
   await demo.request(`/admin/orders/${order.id}`, { method: 'PATCH', body: JSON.stringify({ status: 'preparing' }) });
@@ -50,25 +54,26 @@ test('presentation catalog edits, synthetic orders and persistence are browser-l
   assert.equal((await reloaded.request('/admin/orders')).find(o => o.id === order.id).status, 'preparing');
   assert.equal((await reloaded.request('/catalog')).products.find(p => p.id === product.id).price, 123.5);
   await demo.request(`/admin/products/${product.id}`, { method: 'PATCH', body: JSON.stringify({ active: false }) });
-  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 2 }], region.id, 'tr'));
+  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 2 }], region.id, 'tr', 'Demo Sokak No:10, Daire:5'));
   assert.ok(storage.size > 0);
   await demo.request(`/admin/products/${product.id}`, { method: 'PATCH', body: JSON.stringify({ active: true }) });
   await demo.request(`/admin/categories/${product.categoryId}`, { method: 'PATCH', body: JSON.stringify({ active: false }) });
   assert.equal((await demo.request('/catalog')).products.some(p => p.id === product.id), false);
-  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 2 }], region.id, 'tr'));
+  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 2 }], region.id, 'tr', 'Demo Sokak No:10, Daire:5'));
   await demo.reset();
   const resetCatalog = await demo.request('/catalog');
   assert.equal(resetCatalog.products.find(p => p.id === product.id).price, product.price);
   assert.equal((await demo.request('/admin/orders')).length, 2);
 });
 
-test('presentation HTML is portable and does not request personal or payment details', async () => {
+test('presentation HTML is portable and requires a local demo address but no contact or payment details', async () => {
   const html = await readFile(new URL('index.html', folder), 'utf8');
   assert.match(html, /noindex/);
+  assert.match(html, /name="address" required minlength="10" maxlength="500"/);
   assert.match(html, /\.\/demo-store\.js/);
   assert.match(html, /\.\/admin\.html/);
   assert.doesNotMatch(html, /(?:src|href)="\//);
-  assert.doesNotMatch(html, /name="(?:phone|address|password|cardNumber|consent)"/);
+  assert.doesNotMatch(html, /name="(?:phone|password|cardNumber|consent)"/);
   const script = await readFile(new URL('app.js', folder), 'utf8');
   assert.doesNotMatch(script, /googletagmanager\.com|fetch\('\/api\/|\/api\/orders/);
 });

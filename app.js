@@ -34,10 +34,10 @@ async function request(url) {
  return window.CitirDemo.request('/catalog');
 }
 const demoCopy={
- tr:{panel:'Demo yönetim paneli ↗',checkout:'Demo sipariş oluştur',title:'Sipariş akışını dene',explanation:'Gerçek sipariş oluşturulmaz veya ödeme alınmaz. Ad, telefon ve adres istenmez. Yalnızca bu tarayıcıdaki temsili panele örnek sipariş eklenir.',send:'Temsili siparişi panele ekle',success:'Demo sipariş eklendi. Yönetim panelinden görüntüleyebilirsin.',privacy:'Bu site yalnızca gösterim içindir. Gerçek sipariş, ödeme, müşteri bilgisi toplama veya güvenli kullanıcı yetkilendirmesi yoktur. Sepet ve panel değişiklikleri bu tarayıcıda saklanır; diğer cihazlara aktarılmaz. Panelde demo verileri sıfırlanabilir.'},
- en:{panel:'Demo management panel ↗',checkout:'Create demo order',title:'Try the ordering flow',explanation:'No real order or payment. No name, phone or address is requested. A sample order is added only to this browser’s demonstration panel.',send:'Add sample order to panel',success:'Demo order added. View it in the management panel.',privacy:'Presentation only. No real orders, payments, customer details or secure user authorization. Basket and panel changes are stored only in this browser, not shared with other devices. Reset demo data in the panel.'},
- de:{panel:'Demo-Verwaltung ↗',checkout:'Demo-Bestellung erstellen',title:'Bestellablauf testen',explanation:'Keine echte Bestellung oder Zahlung. Name, Telefon und Adresse werden nicht abgefragt. Ein Beispielauftrag wird nur im Demo-Panel dieses Browsers hinzugefügt.',send:'Beispielauftrag zum Panel hinzufügen',success:'Demo-Bestellung hinzugefügt. Im Verwaltungspanel ansehen.',privacy:'Nur Vorführung. Keine echten Bestellungen, Zahlungen, Kundendaten oder sichere Benutzeranmeldung. Warenkorb und Paneländerungen bleiben nur in diesem Browser und werden nicht mit anderen Geräten geteilt. Demodaten können im Panel zurückgesetzt werden.'},
- ru:{panel:'Демо-панель управления ↗',checkout:'Создать демо-заказ',title:'Попробуйте процесс заказа',explanation:'Реальный заказ и оплата не выполняются. Имя, телефон и адрес не запрашиваются. Пример заказа появится только в демо-панели этого браузера.',send:'Добавить пример заказа в панель',success:'Демо-заказ добавлен. Посмотрите его в панели управления.',privacy:'Только демонстрация. Нет реальных заказов, платежей, сбора клиентских данных или защищённой авторизации. Корзина и изменения панели хранятся только в этом браузере, без передачи другим устройствам. Данные можно сбросить в панели.'}
+ tr:{addressLabel:"Açık teslimat adresi",addressPlaceholder:"Örnek: Demo Sokak No:10, Kat:2, Daire:5",regionLabel:"Seçilen bölge",panel:'Demo yönetim paneli ↗',checkout:'Demo sipariş oluştur',title:'Sipariş akışını dene',explanation:"Gerçek sipariş oluşturulmaz veya ödeme alınmaz. Denemek için örnek bir adres yazın; gerçek kişisel bilgilerinizi kullanmayın. Adres yalnızca bu tarayıcıdaki demo siparişinde saklanır.",send:'Temsili siparişi panele ekle',success:'Demo sipariş eklendi. Yönetim panelinden görüntüleyebilirsin.',privacy:"Bu site yalnızca gösterim içindir. Yazdığınız adres ve sipariş bilgileri yalnızca bu tarayıcıda saklanır; restorana veya sunucuya gönderilmez, başka cihazlarda görünmez. Gerçek adres veya müşteri bilgisi kullanmayın. Panelde Demoyu sıfırla ile veriler silinebilir. Gerçek ödeme veya güvenli giriş yoktur."},
+ en:{addressLabel:"Full delivery address",addressPlaceholder:"Example: Demo Street 10, floor 2, apartment 5",regionLabel:"Selected area",panel:'Demo management panel ↗',checkout:'Create demo order',title:'Try the ordering flow',explanation:"No real orders or payments. Enter an example address, not real personal information. The address is stored only with the demo order in this browser.",send:'Add sample order to panel',success:'Demo order added. View it in the management panel.',privacy:"Presentation only. The address you enter and order details stay in this browser; they are not sent to a restaurant or server or shared with other devices. Do not use real customer information. Reset demo data in the panel. No real payment or secure login."},
+ de:{addressLabel:"Vollständige Lieferadresse",addressPlaceholder:"Beispiel: Demostraße 10, Etage 2, Wohnung 5",regionLabel:"Gewähltes Gebiet",panel:'Demo-Verwaltung ↗',checkout:'Demo-Bestellung erstellen',title:'Bestellablauf testen',explanation:"Keine echten Bestellungen oder Zahlungen. Gib eine Beispieladresse statt persönlicher Daten ein. Die Adresse bleibt nur bei der Demo-Bestellung in diesem Browser.",send:'Beispielauftrag zum Panel hinzufügen',success:'Demo-Bestellung hinzugefügt. Im Verwaltungspanel ansehen.',privacy:"Nur Vorführung. Adresse und Bestelldaten bleiben in diesem Browser und werden nicht an ein Restaurant oder einen Server gesendet oder mit anderen Geräten geteilt. Keine echten Kundendaten eingeben. Über Demo zurücksetzen im Panel löschbar. Keine echte Zahlung oder sichere Anmeldung."},
+ ru:{addressLabel:"Полный адрес доставки",addressPlaceholder:"Пример: улица Демо, дом 10, этаж 2, квартира 5",regionLabel:"Выбранный район",panel:'Демо-панель управления ↗',checkout:'Создать демо-заказ',title:'Попробуйте процесс заказа',explanation:"Реальных заказов и платежей нет. Введите пример адреса, а не личные данные. Адрес сохраняется только в демо-заказе этого браузера.",send:'Добавить пример заказа в панель',success:'Демо-заказ добавлен. Посмотрите его в панели управления.',privacy:"Только демонстрация. Введённый адрес и данные заказа остаются в этом браузере: они не отправляются ресторану или серверу и не видны на других устройствах. Не используйте реальные данные клиентов. Сбросьте демо в панели для удаления данных. Нет реальной оплаты или защищённого входа."}
 };
 const presentationText={tr:'GÖSTERİM DEMOSU · Gerçek sipariş ve ödeme alınmaz. Fiyatlar örnektir.',en:'PRESENTATION DEMO · No real orders or payments. Example prices.',de:'VORFÜHRDEMO · Keine echten Bestellungen oder Zahlungen. Beispielpreise.',ru:'ДЕМОНСТРАЦИЯ · Реальные заказы и платежи не принимаются. Цены примерные.'};
 function applyLanguage() {
@@ -60,7 +60,7 @@ function applyLanguage() {
   let hours=$('#contact-hours');if(!hours){hours=document.createElement('p');hours.id='contact-hours';$('#contact-address').after(hours);}hours.textContent=local(catalog.settings.openingHours);hours.hidden=!hours.textContent;
   renderCategories(); renderProducts(); renderCart();
  }
- renderPrivacy();
+ renderPrivacy();if($('#simulation-dialog').open)renderSimulation();
 
 }
 function renderCategories() {
@@ -99,14 +99,16 @@ function renderCart() {
 }
 function renderSimulation(){
  const copy=demoCopy[lang];$('#simulation-title').textContent=copy.title;$('#simulation-explanation').textContent=copy.explanation;$('#simulate-order').textContent=copy.send;
+ $('#delivery-address-label').textContent=copy.addressLabel;$('#delivery-address').placeholder=copy.addressPlaceholder;$('#delivery-region').textContent=copy.regionLabel+': '+(selectedRegion()?.name || '—');
  $('#simulation-summary').innerHTML=totalMarkup(selectedRegion(),subtotal());
  $('#simulate-order').disabled=!cartLines().length||!selectedRegion()||subtotal()<Number(selectedRegion()?.minSubtotal)||!catalog.settings.open;
 }
 function openCheckout(){if(!selectedRegion()||!cartLines().length)return;$('#cart-dialog').close();$('#simulation-error').textContent='';renderSimulation();$('#simulation-dialog').showModal();}
 function renderPrivacy(){$('#privacy-content').textContent=demoCopy[lang].privacy;}
-$('#simulate-order').addEventListener('click',async()=>{
+$('#simulation-form').addEventListener('submit',async event=>{
+ event.preventDefault();if(!event.currentTarget.reportValidity())return;
  const button=$('#simulate-order');button.disabled=true;
- try{await window.CitirDemo.addOrder(cartLines().map(({productId,quantity})=>({productId,quantity})),regionId,lang);cart=[];saveCart();$('#simulation-dialog').close();notify(demoCopy[lang].success);}
+ try{await window.CitirDemo.addOrder(cartLines().map(({productId,quantity})=>({productId,quantity})),regionId,lang,$('#delivery-address').value);$('#simulation-form').reset();cart=[];saveCart();$('#simulation-dialog').close();notify(demoCopy[lang].success);}
  catch(error){$('#simulation-error').textContent=error.message;}
  finally{button.disabled=false;}
 });

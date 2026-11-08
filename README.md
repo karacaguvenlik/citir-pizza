@@ -10,7 +10,7 @@ GitHub Pages üzerinde çalışan müşteri sitesi ve **temsili yönetim paneli*
 
 Dört dil (TR/EN/DE/RU), menü araması, kategoriler, sepet, bölge minimumu ve temsili sipariş oluşturma. Aynı tarayıcıda oluşturulan örnek sipariş panelde görünür. Ürün/fiyat, kategori, teslimat bölgesi ve site metinleri panelden değiştirilebilir. Demo sıfırlama başlangıç verilerini geri getirir.
 
-**Gerçek sipariş, tahsilat, müşteri bilgisi toplama veya güvenli admin girişi yoktur.** Kullanıcılar bölümü yalnızca temsili bilgilendirmedir. Online ödeme ve reklam ölçümü kapalıdır. Gerçek müşteri, personel veya kart bilgisi yazmayın.
+**Gerçek sipariş, tahsilat, müşteri bilgisi toplama veya güvenli admin girişi yoktur.** Kullanıcılar bölümü yalnızca temsili bilgilendirmedir. Online ödeme ve reklam ölçümü kapalıdır. Adres alanına yalnızca örnek adres yazın; gerçek müşteri, personel veya kart bilgisi kullanmayın. Girilen adres yalnızca bu tarayıcıdaki demo siparişinde tutulur ve panelin sipariş detayında görünür; sunucuya veya restorana gönderilmez.
 
 Veriler `citir-presentation-v1` anahtarıyla ziyaretçinin tarayıcısında saklanır. Sepet/bölge tercihleri de demo adına ayrılmış anahtarlardadır. Diğer cihazlar veya farklı tarayıcılar değişiklikleri görmez; ortak sunucu veritabanı yoktur. Bu durum demo uyarılarında açıkça belirtilir. Fiyatlar örnektir.
 
