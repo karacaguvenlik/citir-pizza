@@ -6,10 +6,11 @@
 <meta name="theme-color" content="#f8f6ef">
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./styles.css">
+<script src="./demo-store.js" defer></script>
 <script src="./app.js" defer></script>
 </head>
 <body>
-<div class="presentation-notice" id="presentation-notice" role="status"></div>
+<div class="presentation-notice"><span id="presentation-notice" role="status"></span> <a id="demo-panel-link" href="./admin.html">Demo yönetim paneli ↗</a></div>
 <a href="#menu" class="skip" data-t="skip">Menüye geç</a>
 <div class="topbar"><span class="topbar-location">⌖ <span data-t="location">Oba, Alanya</span></span><span data-t="topbar">Fırından sofrana, aracı olmadan.</span><a href="tel:+902425388684" class="phone-link">0242 538 86 84 ↗</a></div>
 <header class="header wrap">
@@ -37,5 +38,6 @@
 <button class="mobile-cart" id="mobile-cart" hidden><span><span data-t="cart">Sepetim</span> <b id="mobile-count">0</b></span><span id="mobile-total">₺0</span><span>→</span></button>
 <dialog id="cart-dialog" aria-labelledby="cart-title" class="side-dialog"><div class="dialog-head"><h2 id="cart-title" data-t="yourOrder">Senin siparişin</h2><button class="icon-button close-dialog" aria-label="Kapat">×</button></div><div id="dialog-cart"></div></dialog>
 <dialog id="privacy-dialog" aria-labelledby="privacy-title" class="privacy-dialog"><div class="dialog-head"><h2 id="privacy-title" data-t="privacy">Gizlilik ve sipariş bilgileri</h2><button class="icon-button close-dialog" aria-label="Kapat">×</button></div><div id="privacy-content"></div></dialog>
+<dialog id="simulation-dialog" aria-labelledby="simulation-title"><div class="dialog-head"><h2 id="simulation-title"></h2><button class="icon-button close-dialog" aria-label="Kapat">×</button></div><p id="simulation-explanation"></p><div id="simulation-summary" class="checkout-summary"></div><p id="simulation-error" role="alert" class="error-message"></p><button id="simulate-order" class="button primary full" type="button"></button></dialog>
 <div id="toast" class="toast" role="status" hidden></div>
 </body></html>
