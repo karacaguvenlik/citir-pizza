@@ -158,10 +158,12 @@
     throw error(`Demo isteği desteklenmiyor: ${method} ${route}`, 404);
   }
 
-  async function addOrder(items, regionId, locale = 'tr', address = '') {
+  async function addOrder(items, regionId, locale = 'tr', address = '', orderNote = '') {
     await ready;
     if (typeof address !== 'string' || address.trim().length < 10 || address.length > 500) throw error('Adres 10–500 karakter arasında olmalıdır.');
     const deliveryAddress = address.trim();
+    if (typeof orderNote !== 'string' || orderNote.length > 500) throw error('Sipariş notu en fazla 500 karakter olmalıdır.');
+    const customerNote = orderNote.trim();
     const catalog = state.catalog;
     if (catalog.settings.open === false) throw error('Gösterim mağazası şu anda kapalı.', 409);
     const region = catalog.regions.find(item => String(item.id) === String(regionId) && item.active !== false);
@@ -176,14 +178,17 @@
       if (!product) throw error('Gösterim menüsünde ürün bulunamadı.');
       const category = catalog.categories.find(item => String(item.id) === String(product.categoryId));
       if (!category || category.active === false) throw error('Bu ürünün kategorisi gösterim menüsünde kapalı.');
+      const note = entry.note ?? '';
+      if (typeof note !== 'string' || note.length > 300) throw error('Ürün notu en fazla 300 karakter olmalıdır.');
       const current = grouped.get(String(product.id));
+      if (current && current.note !== note.trim()) throw error('Aynı ürünün notları tutarlı olmalıdır.');
       if (current && current.quantity + quantity > 20) throw error('Bir üründen en fazla 20 adet seçilebilir.');
-      grouped.set(String(product.id), { product, quantity: (current?.quantity || 0) + quantity });
+      grouped.set(String(product.id), { product, note: note.trim(), quantity: (current?.quantity || 0) + quantity });
     }
-    const orderItems = [...grouped.values()].map(({ product, quantity }) => {
+    const orderItems = [...grouped.values()].map(({ product, quantity, note }) => {
       const price = Number(product.price);
       if (!Number.isFinite(price) || price < 0) throw error('Ürün fiyatı geçersiz.');
-      return { productId: product.id, name: localName(product, locale), quantity, price, lineTotal: Math.round(price * quantity * 100) / 100 };
+      return { productId: product.id, name: localName(product, locale), quantity, note, price, lineTotal: Math.round(price * quantity * 100) / 100 };
     });
     const subtotal = Math.round(orderItems.reduce((sum, item) => sum + item.lineTotal, 0) * 100) / 100;
     if (subtotal < Number(region.minSubtotal || 0)) throw error('Bölgenin minimum sepet tutarına ulaşılmadı.', 409);
@@ -191,7 +196,7 @@
     const id = `DEMO-${Date.now().toString(36).toUpperCase()}`;
     const order = {
       id, orderNumber: id, trackingId: id, status: 'new', createdAt: now, updatedAt: now,
-      customer: { name: 'Demo Müşteri', phone: 'Örnek numara', address: deliveryAddress, note: 'Gösterim siparişi; hazırlamayın.' },
+      customer: { name: 'Demo Müşteri', phone: 'Örnek numara', address: deliveryAddress, note: customerNote },
       regionId: region.id, region: { name: region.name }, items: orderItems, subtotal,
       deliveryFee: Number(region.deliveryFee) || 0, total: subtotal + (Number(region.deliveryFee) || 0),
       paymentMethod: 'cash', locale: String(locale || 'tr'), synthetic: true

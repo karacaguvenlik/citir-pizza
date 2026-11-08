@@ -28,3 +28,5 @@ Dosya yolları görecelidir; `/citir-pizza/` veya başka alt klasörde yayınlan
 ## Depodaki ayrı sunuculu sürüm
 
 Önceden mevcut `server.py` ve `static/` dosyaları bu değişiklikte korunmuştur. Bunlar GitHub Pages tarafından çalıştırılmaz ve buradaki temsili panelden ayrıdır. GitHub yayını için herhangi bir sunucu uygulaması başlatmayın; bu sunucu sürümü burada üretime hazır olarak değerlendirilmemiştir.
+
+Sepette her ürün satırına isteğe bağlı 300 karakterlik ürün notu, adres adımına 500 karakterlik genel sipariş notu yazılabilir. Panel sipariş detayında ürün notları ilgili ürünün altında, genel not ise Sipariş notu bölümünde görünür. Notlar da adres gibi yalnızca bu tarayıcıda tutulur; gerçek kişisel bilgi yazmayın.
