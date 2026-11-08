@@ -1,18 +1,17 @@
-# Çıtır Pizza sipariş demosu
+# Çıtır Pizza & Cafe
 
-Alanya Oba için gel-al ve adrese teslim sipariş sitesi. Python standart kütüphanesi yeter, ek paket yok.
+İki gösterim aynı depoda durur.
 
-## Çalıştır
+## Statik vitrin
 
-```bash
-python3 server.py
-```
+Kökteki index.html GitHub Pages içindir. Türkçe, İngilizce, Almanca ve Rusça menü vardır. Gerçek sipariş kaydı yoktur.
 
-Adres: http://127.0.0.1:4173/
-Panel: http://127.0.0.1:4173/panel
+Yayın: Settings, Pages, Branch main, klasör kök. Adres: https://karacaguvenlik.github.io/citir-pizza/
 
-İlk açılışta yönetici şifresi uçbirime yazılır. Kullanıcı adı `admin`. Şifreyi panelden değiştir.
+## Sipariş sunucusu
 
-Siparişler ve fiyatlar `data/store.json` içine yazılır. Bu dosya depoya girmez.
+python3 server.py gel-al ve adrese teslim siparişini kaydeder. Panel yolu /panel.
 
-GitHub Pages bu sunucuyu çalıştıramaz. Gösterim için yukarıdaki komut veya bağlı önizleme kullanılır.
+İlk açılışta yönetici şifresi uçbirime yazılır. Kullanıcı adı admin. Sipariş dosyası data içindedir ve depoya girmez.
+
+GitHub Pages bu Python sunucusunu çalıştıramaz.
