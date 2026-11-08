@@ -271,11 +271,11 @@
       const quantity = Number(item.quantity ?? item.qty ?? 1);
       const unit = Number(item.price ?? item.unitPrice ?? 0);
       const lineTotal = item.lineTotal ?? item.total ?? item.subtotal ?? unit * quantity;
-      items.append(node('div', { className: 'detail-item' }, node('span', {}, `${valueText(item.name || item.productName || item.product?.name)} × ${quantity}`), node('strong', {}, money(lineTotal))));
+      items.append(node('div', { className: 'detail-item' }, node('div', {}, node('span', {}, `${valueText(item.name || item.productName || item.product?.name)} × ${quantity}`), item.note ? node('p', { className: 'detail-item-note' }, node('strong', {}, 'Ürün notu: '), item.note) : null), node('strong', {}, money(lineTotal))));
     });
     const note = c.note || order.note || order.customerNote;
     detail.append(node('h3', { className: 'card-title' }, 'Sipariş içeriği'), items, node('div', { className: 'detail-total' }, node('span', {}, 'Toplam'), node('span', {}, money(orderTotal(order)))));
-    if (note) detail.append(detailBox('Müşteri notu', note));
+    if (note) detail.append(detailBox('Sipariş notu', note));
     const status = node('select', { className: 'select-control', 'aria-label': 'Sipariş durumu' });
     Object.entries(labels).forEach(([value, label]) => status.append(node('option', { value, selected: order.status === value }, label)));
     detail.append(node('div', { className: 'dialog-actions' }, node('button', { className: 'button button-light', type: 'button', onClick: closeDialog }, 'Kapat'), node('button', { className: 'button button-primary', type: 'button', onClick: () => { const next = status.value; closeDialog(); updateOrder(order, next, status); } }, 'Durumu kaydet')));

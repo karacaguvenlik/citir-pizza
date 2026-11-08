@@ -85,3 +85,27 @@ test('demo panel is explicitly non-authenticated and has no password form', asyn
   assert.doesNotMatch(html, /type="password"/);
   assert.doesNotMatch(html, /(?:src|href)="\//);
 });
+
+
+test('item and order notes persist separately, remain optional and enforce limits', async () => {
+  const { demo, storage } = await loadDemo();
+  const catalog = await demo.request('/catalog');
+  const product = catalog.products.find(p => p.categoryId === 'pizza');
+  const other = catalog.products.find(p => p.categoryId === 'pizza' && p.id !== product.id);
+  const region = catalog.regions.find(r => r.name === 'Oba');
+  const address = 'Demo Sokak No:10 Daire:5';
+  const itemNote = 'Soğan olmasın <script>alert(1)</script>';
+  const result = await demo.addOrder([{ productId: product.id, quantity: 1, note: itemNote }, { productId: other.id, quantity: 1, note: 'İyi pişsin' }], region.id, 'tr', address, 'Zili çalmayın');
+  const order = (await (await loadDemo(storage)).demo.request('/admin/orders')).find(o=>o.id===result.id);
+  assert.equal(order.items.find(i=>i.productId===product.id).note, itemNote);
+  assert.equal(order.items.find(i=>i.productId===other.id).note, 'İyi pişsin');
+  assert.equal(order.customer.note, 'Zili çalmayın');
+  assert.equal(order.total, product.price + other.price + region.deliveryFee);
+  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 1, note: 'x'.repeat(301) }], region.id, 'tr', address));
+  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 1, note: {} }], region.id, 'tr', address));
+  await assert.rejects(demo.addOrder([{ productId: product.id, quantity: 1 }], region.id, 'tr', address, 'x'.repeat(501)));
+  const blank = await demo.addOrder([{ productId: product.id, quantity: 1 }], region.id, 'tr', address);
+  const blankOrder = (await demo.request('/admin/orders')).find(o=>o.id===blank.id);
+  assert.equal(blankOrder.items[0].note, '');
+  assert.equal(blankOrder.customer.note, '');
+});
